@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Libas & Co. — Admin Panel</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
 
-/* Login */
 .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; background:#0a0a0a; }
 .login-box { background:#fff; padding:48px; width:380px; border-radius:4px; }
 .login-logo { font-family:Georgia,serif; font-size:28px; font-weight:700; text-align:center; margin-bottom:8px; }
@@ -20,7 +19,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
 .login-btn:hover { background:#b8860b; }
 .login-error { color:red; font-size:12px; text-align:center; margin-top:8px; display:none; }
 
-/* Dashboard */
 .dashboard { display:none; }
 .topbar { background:#0a0a0a; padding:16px 32px; display:flex; align-items:center; justify-content:space-between; }
 .topbar-brand { font-family:Georgia,serif; font-size:20px; color:#fff; }
@@ -32,7 +30,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
 
 .main { display:grid; grid-template-columns:400px 1fr; gap:24px; padding:24px 32px; }
 
-/* Add Product Form */
 .form-card { background:#fff; padding:32px; border-radius:4px; border:1px solid #e5e5e5; height:fit-content; }
 .card-title { font-family:Georgia,serif; font-size:20px; font-weight:600; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid #f0f0f0; }
 .card-title span { color:#b8860b; font-style:italic; }
@@ -49,7 +46,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
 .submit-btn:disabled { background:#ccc; cursor:not-allowed; }
 .success-toast { display:none; background:#e8f5e9; border:1px solid #a5d6a7; color:#2e7d32; padding:12px; border-radius:2px; font-size:13px; text-align:center; margin-top:12px; }
 
-/* Products List */
 .products-card { background:#fff; padding:32px; border-radius:4px; border:1px solid #e5e5e5; }
 .products-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid #f0f0f0; }
 .products-count { font-size:12px; color:#999; letter-spacing:1px; }
@@ -66,29 +62,39 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
 .product-name-mini { font-family:Georgia,serif; font-size:13px; font-weight:600; margin-bottom:4px; }
 .product-cat-mini { font-size:9px; letter-spacing:2px; color:#b8860b; text-transform:uppercase; margin-bottom:6px; }
 .product-price-mini { font-size:12px; color:#333; margin-bottom:10px; }
-.delete-btn { width:100%; padding:7px; background:#fff; border:1px solid #ffcdd2; color:#e53935; font-size:9px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; border-radius:2px; }
-.delete-btn:hover { background:#ffebee; }
+.product-actions { display:flex; gap:6px; }
+.action-btn { flex:1; padding:7px; background:#fff; border:1px solid #ddd; color:#333; font-size:9px; letter-spacing:2px; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; }
+.action-btn:hover { border-color:#b8860b; color:#b8860b; }
+.action-btn.delete { border-color:#ffcdd2; color:#e53935; }
+.action-btn.delete:hover { background:#ffebee; }
 .empty-state { text-align:center; padding:60px 20px; color:#ccc; grid-column:1/-1; }
 .loading { text-align:center; padding:40px; color:#999; grid-column:1/-1; }
+
+.modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:300; align-items:center; justify-content:center; }
+.modal.open { display:flex; }
+.modal-content { background:#fff; padding:32px; border-radius:4px; width:90%; max-width:500px; max-height:90vh; overflow-y:auto; }
+.modal-title { font-family:Georgia,serif; font-size:22px; font-weight:600; margin-bottom:20px; color:#0a0a0a; }
+.modal-close { position:absolute; top:16px; right:16px; background:none; border:none; font-size:24px; cursor:pointer; color:#999; }
+
+@media (max-width:768px) {
+  .main { grid-template-columns:1fr; }
+  .products-grid { grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); }
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-box">
     <div class="login-logo">Libas <span>& Co.</span></div>
     <div class="login-sub">Admin Panel</div>
-    <input type="password" class="login-input" id="passwordInput" placeholder="Enter admin password" onkeypress="if(event.key==='Enter')login()"/>
+    <input type="password" class="login-input" id="passwordInput" placeholder="Enter admin password" onkeypress="if(event.key==='Enter')login()">
     <button class="login-btn" onclick="login()">Access Dashboard</button>
     <div class="login-error" id="loginError">Incorrect password!</div>
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
-
-  <!-- Topbar -->
   <div class="topbar">
     <div class="topbar-brand">Libas <span>& Co.</span></div>
     <div class="topbar-right">
@@ -97,16 +103,13 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
     </div>
   </div>
 
-  <!-- Main -->
   <div class="main">
-
-    <!-- Add Product -->
     <div class="form-card">
       <div class="card-title">Add <span>New Product</span></div>
 
       <div class="form-group">
         <label class="form-label">Product Name</label>
-        <input type="text" class="form-input" id="pName" placeholder="e.g. Linen Kurta"/>
+        <input type="text" class="form-input" id="pName" placeholder="e.g. Linen Kurta">
       </div>
 
       <div class="form-row">
@@ -132,27 +135,25 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">Price (PKR)</label>
-          <input type="number" class="form-input" id="pPrice" placeholder="1400"/>
+          <input type="number" class="form-input" id="pPrice" placeholder="1400">
         </div>
         <div class="form-group">
           <label class="form-label">Original Price</label>
-          <input type="number" class="form-input" id="pOriginalPrice" placeholder="2000"/>
+          <input type="number" class="form-input" id="pOriginalPrice" placeholder="2000">
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">Sizes (comma separated)</label>
-        <input type="text" class="form-input" id="pSizes" placeholder="S, M, L, XL, XXL"/>
+        <input type="text" class="form-input" id="pSizes" placeholder="S, M, L, XL, XXL">
       </div>
 
       <div class="form-group">
         <label class="form-label">Product Image</label>
-        <input type="file" id="pImage" accept="image/*" style="display:none" onchange="previewImg(this)"/>
+        <input type="file" id="pImage" accept="image/*" style="display:none" onchange="previewImg(this)">
         <div class="img-preview" onclick="document.getElementById('pImage').click()">
-          <img id="imgPreview" src=""/>
-          <div class="img-preview-text" id="imgPreviewText">
-            📷 Click to upload image
-          </div>
+          <img id="imgPreview">
+          <div class="img-preview-text" id="imgPreviewText">📷 Click to upload image</div>
         </div>
       </div>
 
@@ -160,12 +161,11 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
       <div class="success-toast" id="successToast">✅ Product added successfully!</div>
     </div>
 
-    <!-- Products List -->
     <div class="products-card">
       <div class="products-header">
         <div class="card-title" style="margin:0;border:none;padding:0">All <span style="color:#b8860b;font-style:italic">Products</span></div>
         <div style="display:flex;align-items:center;gap:16px;">
-          <span class="products-count" id="productsCount">Loading...</span>
+          <span class="products-count" id="productsCount">0 products</span>
           <div class="filter-tabs">
             <button class="filter-tab active" onclick="filterProducts('all',this)">All</button>
             <button class="filter-tab" onclick="filterProducts('mens',this)">Men's</button>
@@ -174,164 +174,303 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
           </div>
         </div>
       </div>
-      <div class="products-grid" id="productsGrid">
-        <div class="loading">Loading products...</div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="editModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeEditModal()">✕</button>
+    <h2 class="modal-title">Edit Product</h2>
+    
+    <div class="form-group">
+      <label class="form-label">Product Name</label>
+      <input type="text" class="form-input" id="eName" placeholder="Product name">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="eCategory">
+          <option value="mens">Men's</option>
+          <option value="kids">Kids'</option>
+          <option value="festive">Festive</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Label</label>
+        <select class="form-select" id="eLabel">
+          <option value="">None</option>
+          <option value="New">New</option>
+          <option value="Sale">Sale</option>
+          <option value="Hot">Hot</option>
+        </select>
       </div>
     </div>
 
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Price (PKR)</label>
+        <input type="number" class="form-input" id="ePrice" placeholder="1400">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Original Price</label>
+        <input type="number" class="form-input" id="eOriginalPrice" placeholder="2000">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Sizes (comma separated)</label>
+      <input type="text" class="form-input" id="eSizes" placeholder="S, M, L, XL, XXL">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Product Image</label>
+      <input type="file" id="eImage" accept="image/*" style="display:none" onchange="previewEditImg(this)">
+      <div class="img-preview" onclick="document.getElementById('eImage').click()">
+        <img id="eImgPreview">
+        <div class="img-preview-text" id="eImgPreviewText">📷 Click to change image</div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="updateBtn" onclick="updateProduct()">Update Product</button>
   </div>
 </div>
 
 <script>
-  const ADMIN_PASSWORD = 'libas2026';
-  let allProducts = [];
-  let currentFilter = 'all';
+const ADMIN_PASSWORD = 'libas2026';
+const API_URL = 'https://libas-admin.onrender.com/api/products';
+let allProducts = [];
+let currentFilter = 'all';
+let editingProductId = null;
 
-  // Login
-  function login() {
-    const pwd = document.getElementById('passwordInput').value;
-    if (pwd === ADMIN_PASSWORD) {
-      document.getElementById('loginWrap').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
+function login() {
+  const pwd = document.getElementById('passwordInput').value;
+  if (pwd === ADMIN_PASSWORD) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadProducts();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function logout() {
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('passwordInput').value = '';
+}
+
+function previewImg(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('imgPreview').src = e.target.result;
+      document.getElementById('imgPreview').style.display = 'block';
+      document.getElementById('imgPreviewText').style.display = 'none';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function previewEditImg(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('eImgPreview').src = e.target.result;
+      document.getElementById('eImgPreview').style.display = 'block';
+      document.getElementById('eImgPreviewText').style.display = 'none';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function addProduct() {
+  const name = document.getElementById('pName').value;
+  const category = document.getElementById('pCategory').value;
+  const price = document.getElementById('pPrice').value;
+  const origPrice = document.getElementById('pOriginalPrice').value;
+  const label = document.getElementById('pLabel').value;
+  const sizes = document.getElementById('pSizes').value;
+  const image = document.getElementById('pImage').files[0];
+
+  if (!name || !price || !image) {
+    alert('Name, price, and image are required!');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('category', category);
+  formData.append('price', price);
+  formData.append('originalPrice', origPrice);
+  formData.append('label', label);
+  formData.append('sizes', sizes);
+  formData.append('image', image);
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      document.getElementById('successToast').style.display = 'block';
+      setTimeout(() => document.getElementById('successToast').style.display = 'none', 3000);
+      
+      document.getElementById('pName').value = '';
+      document.getElementById('pPrice').value = '';
+      document.getElementById('pOriginalPrice').value = '';
+      document.getElementById('pSizes').value = '';
+      document.getElementById('pImage').value = '';
+      document.getElementById('imgPreview').style.display = 'none';
+      document.getElementById('imgPreviewText').style.display = 'block';
+
       loadProducts();
-    } else {
-      document.getElementById('loginError').style.display = 'block';
     }
+  } catch(err) {
+    alert('Error: ' + err.message);
   }
 
-  function logout() {
-    document.getElementById('loginWrap').style.display = 'flex';
-    document.getElementById('dashboard').style.display = 'none';
-    document.getElementById('passwordInput').value = '';
+  btn.disabled = false;
+  btn.textContent = '◆ Add Product';
+}
+
+async function loadProducts() {
+  try {
+    const res = await fetch(API_URL);
+    allProducts = await res.json();
+    renderProducts(allProducts);
+  } catch(err) {
+    document.getElementById('productsGrid').innerHTML = '<div class="empty-state">Could not load products</div>';
+  }
+}
+
+function filterProducts(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat);
+  renderProducts(filtered);
+}
+
+function renderProducts(products) {
+  const grid = document.getElementById('productsGrid');
+  document.getElementById('productsCount').textContent = products.length + ' products';
+
+  if (products.length === 0) {
+    grid.innerHTML = '<div class="empty-state">No products yet</div>';
+    return;
   }
 
-  // Image preview
-  function previewImg(input) {
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        document.getElementById('imgPreview').src = e.target.result;
-        document.getElementById('imgPreview').style.display = 'block';
-        document.getElementById('imgPreviewText').style.display = 'none';
-      };
-      reader.readAsDataURL(input.files[0]);
-    }
-  }
-
-  // Add product
-  async function addProduct() {
-    const name     = document.getElementById('pName').value;
-    const category = document.getElementById('pCategory').value;
-    const price    = document.getElementById('pPrice').value;
-    const origPrice= document.getElementById('pOriginalPrice').value;
-    const label    = document.getElementById('pLabel').value;
-    const sizes    = document.getElementById('pSizes').value;
-    const image    = document.getElementById('pImage').files[0];
-
-    if (!name || !price || !image) {
-      alert('Name, price aur image zaroori hai!');
-      return;
-    }
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Uploading...';
-
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('category', category);
-    formData.append('price', price);
-    formData.append('originalPrice', origPrice);
-    formData.append('label', label);
-    formData.append('sizes', sizes);
-    formData.append('image', image);
-
-    try {
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        document.getElementById('successToast').style.display = 'block';
-        setTimeout(() => document.getElementById('successToast').style.display = 'none', 3000);
-
-        // Reset form
-        document.getElementById('pName').value = '';
-        document.getElementById('pPrice').value = '';
-        document.getElementById('pOriginalPrice').value = '';
-        document.getElementById('pSizes').value = '';
-        document.getElementById('pImage').value = '';
-        document.getElementById('imgPreview').style.display = 'none';
-        document.getElementById('imgPreviewText').style.display = 'block';
-
-        loadProducts();
-      }
-    } catch(err) {
-      alert('Error: ' + err.message);
-    }
-
-    btn.disabled = false;
-    btn.textContent = '◆ Add Product';
-  }
-
-  // Load products
-  async function loadProducts() {
-    try {
-      const res = await fetch('/api/products');
-      allProducts = await res.json();
-      renderProducts(allProducts);
-    } catch(err) {
-      document.getElementById('productsGrid').innerHTML = '<div class="empty-state">Could not load products</div>';
-    }
-  }
-
-  // Filter
-  function filterProducts(cat, btn) {
-    currentFilter = cat;
-    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const filtered = cat === 'all' ? allProducts : allProducts.filter(p => p.category === cat);
-    renderProducts(filtered);
-  }
-
-  // Render
-  function renderProducts(products) {
-    const grid = document.getElementById('productsGrid');
-    document.getElementById('productsCount').textContent = products.length + ' products';
-
-    if (products.length === 0) {
-      grid.innerHTML = '<div class="empty-state">No products yet — add your first one!</div>';
-      return;
-    }
-
-    grid.innerHTML = products.map(p => `
-      <div class="product-item">
-        <div class="product-img">
-          ${p.label ? `<div class="product-label-tag">${p.label}</div>` : ''}
-          <img src="${p.image}" alt="${p.name}"/>
-        </div>
-        <div class="product-info-mini">
-          <div class="product-cat-mini">${p.category}</div>
-          <div class="product-name-mini">${p.name}</div>
-          <div class="product-price-mini">PKR ${p.price.toLocaleString()}</div>
-          <button class="delete-btn" onclick="deleteProduct('${p._id}')">✕ Remove</button>
+  grid.innerHTML = products.map(p => `
+    <div class="product-item">
+      <div class="product-img">
+        ${p.label ? `<div class="product-label-tag">${p.label}</div>` : ''}
+        <img src="${p.image}" alt="${p.name}"/>
+      </div>
+      <div class="product-info-mini">
+        <div class="product-cat-mini">${p.category}</div>
+        <div class="product-name-mini">${p.name}</div>
+        <div class="product-price-mini">PKR ${p.price.toLocaleString()}</div>
+        <div class="product-actions">
+          <button class="action-btn" onclick="openEditModal('${p._id}')">✎ Edit</button>
+          <button class="action-btn delete" onclick="deleteProduct('${p._id}')">✕ Delete</button>
         </div>
       </div>
-    `).join('');
+    </div>
+  `).join('');
+}
+
+function openEditModal(productId) {
+  const product = allProducts.find(p => p._id === productId);
+  if (!product) return;
+
+  editingProductId = productId;
+  
+  document.getElementById('eName').value = product.name;
+  document.getElementById('eCategory').value = product.category;
+  document.getElementById('eLabel').value = product.label || '';
+  document.getElementById('ePrice').value = product.price;
+  document.getElementById('eOriginalPrice').value = product.originalPrice || '';
+  document.getElementById('eSizes').value = product.sizes.join(', ');
+  document.getElementById('eImage').value = '';
+  document.getElementById('eImgPreview').src = product.image;
+  document.getElementById('eImgPreview').style.display = 'block';
+  document.getElementById('eImgPreviewText').style.display = 'none';
+
+  document.getElementById('editModal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('editModal').classList.remove('open');
+  editingProductId = null;
+}
+
+async function updateProduct() {
+  if (!editingProductId) return;
+
+  const name = document.getElementById('eName').value;
+  const category = document.getElementById('eCategory').value;
+  const price = document.getElementById('ePrice').value;
+  const origPrice = document.getElementById('eOriginalPrice').value;
+  const label = document.getElementById('eLabel').value;
+  const sizes = document.getElementById('eSizes').value;
+  const image = document.getElementById('eImage').files[0];
+
+  if (!name || !price) {
+    alert('Name and price are required!');
+    return;
   }
 
-  // Delete
-  async function deleteProduct(id) {
-    if (!confirm('Product delete karna chahte ho?')) return;
-    try {
-      await fetch('/api/products/' + id, { method: 'DELETE' });
+  const btn = document.getElementById('updateBtn');
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('category', category);
+  formData.append('price', price);
+  formData.append('originalPrice', origPrice);
+  formData.append('label', label);
+  formData.append('sizes', sizes);
+  if (image) formData.append('image', image);
+
+  try {
+    const res = await fetch(API_URL + '/' + editingProductId, {
+      method: 'PUT',
+      body: formData
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      closeEditModal();
       loadProducts();
-    } catch(err) {
-      alert('Error deleting product');
     }
+  } catch(err) {
+    alert('Error: ' + err.message);
   }
+
+  btn.disabled = false;
+  btn.textContent = 'Update Product';
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  try {
+    await fetch(API_URL + '/' + id, { method: 'DELETE' });
+    loadProducts();
+  } catch(err) {
+    alert('Error deleting product');
+  }
+}
 </script>
+
 </body>
 </html>
