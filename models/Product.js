@@ -10,6 +10,7 @@ const productSchema = new mongoose.Schema({
   images: [String],
   label: { type: String, enum: ['New', 'Sale', 'Hot', ''], default: '' },
   sizes: [String],
+  position: { type: Number, default: 0 },
   inStock: { type: Boolean, default: true }
 }, { timestamps: true });
 

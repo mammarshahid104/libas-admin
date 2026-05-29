@@ -28,10 +28,10 @@ async function uploadToCloudinary(buffer) {
   });
 }
 
-// GET all products
+// GET all products sorted by position
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().sort({ position: 1 });
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -144,6 +144,19 @@ router.post('/import', async (req, res) => {
     res.json({ success: true, product });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Reorder products
+router.post('/reorder', async (req, res) => {
+  try {
+    const { order } = req.body;
+    for (const item of order) {
+      await Product.findByIdAndUpdate(item.id, { position: item.position });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
