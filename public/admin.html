@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0045)file:///C:/Users/ammar/Downloads/admin_6.html -->
+<!-- saved from url=(0046)file:///C:/Users/ammar/Downloads/admin_10.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -167,12 +167,13 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
       </div>
 
       <div class="form-group">
-        <label class="form-label">Product Image</label>
-        <input type="file" id="pImage" accept="image/*" style="display:none" onchange="previewImg(this)">
+        <label class="form-label">Product Images (Max 5)</label>
+        <input type="file" id="pImage" accept="image/*" multiple="" style="display:none" onchange="previewImgs(this)">
         <div class="img-preview" onclick="document.getElementById(&#39;pImage&#39;).click()">
           <img id="imgPreview">
-          <div class="img-preview-text" id="imgPreviewText">📷 Click to upload image</div>
+          <div class="img-preview-text" id="imgPreviewText">📷 Click to upload images (select multiple)</div>
         </div>
+        <div id="imgPreviewGrid" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
       </div>
 
       <button class="submit-btn" id="submitBtn" onclick="addProduct()">◆ Add Product</button>
@@ -268,12 +269,13 @@ body { font-family: 'Segoe UI', sans-serif; background:#f5f5f5; }
     </div>
 
     <div class="form-group">
-      <label class="form-label">Product Image</label>
-      <input type="file" id="eImage" accept="image/*" style="display:none" onchange="previewEditImg(this)">
+      <label class="form-label">Product Images (Max 5)</label>
+      <input type="file" id="eImage" accept="image/*" multiple="" style="display:none" onchange="previewEditImgs(this)">
       <div class="img-preview" onclick="document.getElementById(&#39;eImage&#39;).click()">
         <img id="eImgPreview">
-        <div class="img-preview-text" id="eImgPreviewText">📷 Click to change image</div>
+        <div class="img-preview-text" id="eImgPreviewText">📷 Click to change images</div>
       </div>
+      <div id="eImgPreviewGrid" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
     </div>
 
     <button class="submit-btn" id="updateBtn" onclick="updateProduct()">Update Product</button>
@@ -320,27 +322,37 @@ function logout() {
   document.getElementById('passwordInput').value = '';
 }
 
-function previewImg(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById('imgPreview').src = e.target.result;
-      document.getElementById('imgPreview').style.display = 'block';
-      document.getElementById('imgPreviewText').style.display = 'none';
-    };
-    reader.readAsDataURL(input.files[0]);
+function previewImgs(input) {
+  const grid = document.getElementById('imgPreviewGrid');
+  grid.innerHTML = '';
+  if (input.files && input.files.length > 0) {
+    document.getElementById('imgPreview').src = URL.createObjectURL(input.files[0]);
+    document.getElementById('imgPreview').style.display = 'block';
+    document.getElementById('imgPreviewText').style.display = 'none';
+    Array.from(input.files).forEach((file, i) => {
+      if (i === 0) return;
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.style.cssText = 'width:60px;height:60px;object-fit:cover;border:1px solid #ddd;border-radius:2px;';
+      grid.appendChild(img);
+    });
   }
 }
 
-function previewEditImg(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      document.getElementById('eImgPreview').src = e.target.result;
-      document.getElementById('eImgPreview').style.display = 'block';
-      document.getElementById('eImgPreviewText').style.display = 'none';
-    };
-    reader.readAsDataURL(input.files[0]);
+function previewEditImgs(input) {
+  const grid = document.getElementById('eImgPreviewGrid');
+  grid.innerHTML = '';
+  if (input.files && input.files.length > 0) {
+    document.getElementById('eImgPreview').src = URL.createObjectURL(input.files[0]);
+    document.getElementById('eImgPreview').style.display = 'block';
+    document.getElementById('eImgPreviewText').style.display = 'none';
+    Array.from(input.files).forEach((file, i) => {
+      if (i === 0) return;
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.style.cssText = 'width:60px;height:60px;object-fit:cover;border:1px solid #ddd;border-radius:2px;';
+      grid.appendChild(img);
+    });
   }
 }
 
@@ -352,10 +364,10 @@ async function addProduct() {
   const origPrice = document.getElementById('pOriginalPrice').value;
   const label = document.getElementById('pLabel').value;
   const sizes = document.getElementById('pSizes').value;
-  const image = document.getElementById('pImage').files[0];
+  const image = document.getElementById('pImage').files;
 
-  if (!name || !price || !image) {
-    alert('Name, price, and image are required!');
+  if (!name || !price || !image.length) {
+    alert('Name, price, and at least one image are required!');
     return;
   }
 
@@ -371,7 +383,7 @@ async function addProduct() {
   formData.append('originalPrice', origPrice);
   formData.append('label', label);
   formData.append('sizes', sizes);
-  formData.append('image', image);
+  Array.from(image).forEach(file => formData.append('images', file));
 
   try {
     const res = await fetch(API_URL, { method: 'POST', body: formData });
@@ -385,6 +397,7 @@ async function addProduct() {
       document.getElementById('pOriginalPrice').value = '';
       document.getElementById('pSizes').value = '';
       document.getElementById('pImage').value = '';
+      document.getElementById('imgPreviewGrid').innerHTML = '';
       document.getElementById('imgPreview').style.display = 'none';
       document.getElementById('imgPreviewText').style.display = 'block';
       loadProducts();
@@ -456,9 +469,19 @@ function openEditModal(productId) {
   document.getElementById('eOriginalPrice').value = product.originalPrice || '';
   document.getElementById('eSizes').value = product.sizes.join(', ');
   document.getElementById('eImage').value = '';
-  document.getElementById('eImgPreview').src = product.image;
-  document.getElementById('eImgPreview').style.display = 'block';
-  document.getElementById('eImgPreviewText').style.display = 'none';
+  document.getElementById('eImgPreviewGrid').innerHTML = '';
+  const existingImages = product.images && product.images.length ? product.images : (product.image ? [product.image] : []);
+  if (existingImages.length > 0) {
+    document.getElementById('eImgPreview').src = existingImages[0];
+    document.getElementById('eImgPreview').style.display = 'block';
+    document.getElementById('eImgPreviewText').style.display = 'none';
+    existingImages.slice(1).forEach(url => {
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.cssText = 'width:60px;height:60px;object-fit:cover;border:1px solid #ddd;border-radius:2px;';
+      document.getElementById('eImgPreviewGrid').appendChild(img);
+    });
+  }
 
   document.getElementById('editModal').classList.add('open');
 }
@@ -478,7 +501,7 @@ async function updateProduct() {
   const origPrice = document.getElementById('eOriginalPrice').value;
   const label = document.getElementById('eLabel').value;
   const sizes = document.getElementById('eSizes').value;
-  const image = document.getElementById('eImage').files[0];
+  const images = document.getElementById('eImage').files;
 
   if (!name || !price) {
     alert('Name and price are required!');
@@ -497,7 +520,9 @@ async function updateProduct() {
   formData.append('originalPrice', origPrice);
   formData.append('label', label);
   formData.append('sizes', sizes);
-  if (image) formData.append('image', image);
+  if (images && images.length > 0) {
+    Array.from(images).forEach(file => formData.append('images', file));
+  }
 
   try {
     const res = await fetch(API_URL + '/' + editingProductId, { method: 'PUT', body: formData });
@@ -527,7 +552,7 @@ async function deleteProduct(id) {
 
 
 
-<script src="./Co. — Admin_files/xlsx.full.min.js.download"></script>
+<script src="./Libas &amp; Co. — Admin Panel_files/xlsx.full.min.js.download"></script>
 <script>
 let excelData = [];
 

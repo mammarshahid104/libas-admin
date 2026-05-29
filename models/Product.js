@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   originalPrice: { type: Number },
   image: { type: String },
+  images: [String],
   label: { type: String, enum: ['New', 'Sale', 'Hot', ''], default: '' },
   sizes: [String],
   inStock: { type: Boolean, default: true }

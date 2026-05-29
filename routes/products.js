@@ -15,6 +15,20 @@ cloudinary.config({
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
+// Upload single file to Cloudinary
+async function uploadToCloudinary(buffer) {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      { folder: 'libas-co' },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      }
+    ).end(buffer);
+  });
+}
+
+// GET all products
 router.get('/', async (req, res) => {
   try {
     const products = await Product.find();
@@ -24,26 +38,27 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', upload.single('image'), async (req, res) => {
+// POST add product (multiple images)
+router.post('/', upload.array('images', 5), async (req, res) => {
   try {
-    const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        { folder: 'libas-co' },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      ).end(req.file.buffer);
-    });
+    let imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const url = await uploadToCloudinary(file.buffer);
+        imageUrls.push(url);
+      }
+    }
 
     const product = new Product({
       name: req.body.name,
       category: req.body.category,
+      subcategory: req.body.subcategory || '',
       price: req.body.price,
-      originalPrice: req.body.originalPrice,
-      image: result.secure_url,
-      label: req.body.label,
-      sizes: req.body.sizes.split(',').map(s => s.trim()),
+      originalPrice: req.body.originalPrice || undefined,
+      image: imageUrls[0] || '',
+      images: imageUrls,
+      label: req.body.label || '',
+      sizes: req.body.sizes ? req.body.sizes.split(',').map(s => s.trim()) : [],
       inStock: true
     });
 
@@ -54,23 +69,20 @@ router.post('/', upload.single('image'), async (req, res) => {
   }
 });
 
-router.put('/:id', upload.single('image'), async (req, res) => {
+// PUT update product
+router.put('/:id', upload.array('images', 5), async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
 
-    let imageUrl = product.image;
-    if (req.file) {
-      const result = await new Promise((resolve, reject) => {
-        cloudinary.uploader.upload_stream(
-          { folder: 'libas-co' },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        ).end(req.file.buffer);
-      });
-      imageUrl = result.secure_url;
+    let imageUrls = product.images && product.images.length ? product.images : (product.image ? [product.image] : []);
+
+    if (req.files && req.files.length > 0) {
+      imageUrls = [];
+      for (const file of req.files) {
+        const url = await uploadToCloudinary(file.buffer);
+        imageUrls.push(url);
+      }
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -78,10 +90,12 @@ router.put('/:id', upload.single('image'), async (req, res) => {
       {
         name: req.body.name || product.name,
         category: req.body.category || product.category,
+        subcategory: req.body.subcategory || product.subcategory,
         price: req.body.price || product.price,
         originalPrice: req.body.originalPrice || product.originalPrice,
-        image: imageUrl,
-        label: req.body.label || product.label,
+        image: imageUrls[0] || product.image,
+        images: imageUrls,
+        label: req.body.label !== undefined ? req.body.label : product.label,
         sizes: req.body.sizes ? req.body.sizes.split(',').map(s => s.trim()) : product.sizes,
         inStock: req.body.inStock !== undefined ? req.body.inStock : product.inStock
       },
@@ -94,6 +108,7 @@ router.put('/:id', upload.single('image'), async (req, res) => {
   }
 });
 
+// DELETE product
 router.delete('/:id', async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
@@ -103,7 +118,7 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// Bulk import via Excel (image URL based)
+// Bulk import via Excel
 router.post('/import', async (req, res) => {
   try {
     const { name, category, subcategory, price, originalPrice, sizes, label, image } = req.body;
@@ -119,6 +134,7 @@ router.post('/import', async (req, res) => {
       price: Number(price),
       originalPrice: originalPrice ? Number(originalPrice) : undefined,
       image: image || '',
+      images: image ? [image] : [],
       label: label || '',
       sizes: sizes || [],
       inStock: true
