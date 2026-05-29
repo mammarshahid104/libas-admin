@@ -103,4 +103,32 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
+// Bulk import via Excel (image URL based)
+router.post('/import', async (req, res) => {
+  try {
+    const { name, category, subcategory, price, originalPrice, sizes, label, image } = req.body;
+
+    if (!name || !price) {
+      return res.json({ success: false, message: 'Name and price required' });
+    }
+
+    const product = new Product({
+      name,
+      category: category || 'mens',
+      subcategory: subcategory || '',
+      price: Number(price),
+      originalPrice: originalPrice ? Number(originalPrice) : undefined,
+      image: image || '',
+      label: label || '',
+      sizes: sizes || [],
+      inStock: true
+    });
+
+    await product.save();
+    res.json({ success: true, product });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;
