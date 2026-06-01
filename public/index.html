@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///C:/Users/ammar/Downloads/index-v2_1.html -->
+<!-- saved from url=(0048)file:///C:/Users/ammar/Downloads/index-v2_2.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,7 +73,7 @@ nav::after{content:'';position:absolute;bottom:0;left:64px;right:64px;height:1px
 .marquee-track{display:inline-flex;animation:marquee 20s linear infinite;}
 .marquee-item{font-family:'Cormorant Garamond',serif;font-size:13px;font-style:italic;color:var(--white);letter-spacing:3px;padding:0 32px;}
 
-.section{padding:100px 64px;}
+.section{padding:100px clamp(16px,5vw,64px);}
 .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,4vw,60px);font-weight:300;text-align:center;color:var(--black);margin-bottom:14px;line-height:1.1;}
 .section-title em{font-style:italic;color:var(--gold);}
 .section-sub{text-align:center;font-size:13px;font-weight:300;color:var(--grey);max-width:440px;margin:0 auto 64px;line-height:1.8;}
@@ -173,7 +173,10 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
   .footer-grid{gap:40px;}
 }
 
+.trust-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center;}
+
 @media (max-width: 768px) {
+  .trust-grid{grid-template-columns:repeat(2,1fr);gap:20px;}
   .product-grid{grid-template-columns:repeat(2,1fr);}
   nav{padding:12px 20px;}
   .nav-brand{font-size:18px;}
@@ -200,13 +203,14 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
   footer{padding:30px 16px 20px;}
   .footer-col h3{font-size:12px;}
   .footer-col p{font-size:11px;}
+  .trust-grid{grid-template-columns:repeat(2,1fr);gap:16px;}
 }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="file:///C:/Users/ammar/Downloads/index-v2_1.html#" class="nav-brand">Libas <em>&amp; Co.</em></a>
+  <a href="file:///C:/Users/ammar/Downloads/index-v2_2.html#" class="nav-brand">Libas <em>&amp; Co.</em></a>
   <div style="position:relative;cursor:pointer;font-size:16px;" onclick="openCart()">
     🛒 <span id="cartCount">0</span>
   </div>
@@ -446,8 +450,8 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
 </div>
 
 <!-- TRUST SIGNALS -->
-<div style="background:var(--black);padding:40px 64px;">
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:32px;text-align:center;">
+<div style="background:var(--black);padding:40px clamp(16px,5vw,64px);">
+  <div class="trust-grid">
     <div>
       <div style="font-size:28px;margin-bottom:8px;">🚚</div>
       <div style="font-family:&#39;Cormorant Garamond&#39;,serif;font-size:16px;color:var(--white);font-weight:600;margin-bottom:4px;">Fast Delivery</div>
@@ -472,7 +476,7 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
 </div>
 
 <!-- SIZE GUIDE -->
-<div style="background:var(--cream);padding:80px 64px;">
+<div style="background:var(--cream);padding:80px clamp(16px,5vw,64px);">
   <h2 class="section-title">Size <em>Guide</em></h2>
   <p class="section-sub" style="margin-bottom:40px;">Find your perfect fit with our size chart</p>
   <div style="max-width:700px;margin:0 auto;overflow-x:auto;">
@@ -523,7 +527,7 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
 </div>
 
 <!-- REVIEWS -->
-<div style="background:var(--grey-ultra);padding:80px 64px;">
+<div style="background:var(--grey-ultra);padding:80px clamp(16px,5vw,64px);">
   <h2 class="section-title">What Our <em>Customers Say</em></h2>
   <p class="section-sub">Real reviews from real customers</p>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:1000px;margin:0 auto;">
@@ -546,7 +550,7 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
 </div>
 
 <!-- BRAND STORY -->
-<div style="background:var(--cream);padding:100px 64px;">
+<div style="background:var(--cream);padding:100px clamp(16px,5vw,64px);">
   <div style="max-width:800px;margin:0 auto;text-align:center;">
     <div style="font-family:&#39;DM Mono&#39;,monospace;font-size:9px;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:24px;">Our Story</div>
     <h2 class="section-title" style="margin-bottom:24px;">Born from a <em>Love of Craft</em></h2>
@@ -571,7 +575,7 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
 </div>
 
 <!-- DELIVERY & RETURNS -->
-<div style="background:var(--black);padding:80px 64px;">
+<div style="background:var(--black);padding:80px clamp(16px,5vw,64px);">
   <h2 class="section-title" style="color:var(--white);">Delivery &amp; <em>Returns</em></h2>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:40px;max-width:900px;margin:40px auto 0;">
     <div style="border:1px solid rgba(255,255,255,0.1);padding:32px;">
@@ -593,7 +597,7 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
 </div>
 
 <!-- INSTAGRAM CTA -->
-<div style="background:var(--cream);padding:80px 64px;text-align:center;">
+<div style="background:var(--cream);padding:80px clamp(16px,5vw,64px);text-align:center;">
   <div style="font-family:&#39;DM Mono&#39;,monospace;font-size:9px;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:16px;">Follow Us</div>
   <h2 class="section-title" style="margin-bottom:16px;">Find Us on <em>Instagram</em></h2>
   <p style="font-size:13px;color:var(--grey);margin-bottom:32px;">Stay updated with our latest collections, style inspiration, and exclusive offers.</p>
@@ -610,15 +614,15 @@ footer{background:var(--black);color:var(--white);padding:80px 64px 40px;}
       <h3>Contact</h3>
       <p>📍 Lahore, Pakistan</p>
       <p>📱 <a href="https://wa.me/923104508143">WhatsApp: +92 310 4508143</a></p>
-      <p>🌐 <a href="file:///C:/Users/ammar/Downloads/index-v2_1.html#">www.libasandco.com</a></p>
+      <p>🌐 <a href="file:///C:/Users/ammar/Downloads/index-v2_2.html#">www.libasandco.com</a></p>
     </div>
     
     <div class="footer-col">
       <h3>Collections</h3>
-      <a href="file:///C:/Users/ammar/Downloads/index-v2_1.html#">Men's Wear</a><br>
-      <a href="file:///C:/Users/ammar/Downloads/index-v2_1.html#">Kids' Wear</a><br>
-      <a href="file:///C:/Users/ammar/Downloads/index-v2_1.html#">Festive Wear</a><br>
-      <a href="file:///C:/Users/ammar/Downloads/index-v2_1.html#">Premium Fabrics</a>
+      <a href="file:///C:/Users/ammar/Downloads/index-v2_2.html#">Men's Wear</a><br>
+      <a href="file:///C:/Users/ammar/Downloads/index-v2_2.html#">Kids' Wear</a><br>
+      <a href="file:///C:/Users/ammar/Downloads/index-v2_2.html#">Festive Wear</a><br>
+      <a href="file:///C:/Users/ammar/Downloads/index-v2_2.html#">Premium Fabrics</a>
     </div>
     
     <div class="footer-col">
