@@ -15,7 +15,10 @@ app.use('/uploads', express.static('uploads'));
 app.use(express.static('public'));
 
 const productRoutes = require('./routes/products');
+const orderRoutes = require('./routes/orders');
+
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 mongoose.connect(process.env.MONGO_URI, {
   serverSelectionTimeoutMS: 30000,
